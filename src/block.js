@@ -44,6 +44,10 @@ class Block {
             self.hash = null   
             // Recalculate the hash of the Block
             let calculatedHash = SHA256(JSON.stringify(self)).toString();
+            
+            // reupdate self hash to actual value
+            self.hash = auxVar
+
             // Comparing if the hashes changed
             if (auxVar != calculatedHash) {
                 // Returning the Block is not valid
