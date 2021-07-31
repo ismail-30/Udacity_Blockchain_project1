@@ -63,7 +63,7 @@ class Blockchain {
      */
     _addBlock(block) {
         let self = this;
-        return new Promise(async (resolve) => {
+        return new Promise(async (resolve, reject) => {
             
             block.height = self.height + 1;
             block.time = new Date().getTime().toString().slice(0, -3);
@@ -75,10 +75,18 @@ class Blockchain {
                 block.previousBlockHash = self.chain.slice(-1)[0].hash;
             }
             block.hash = SHA256(JSON.stringify(block)).toString();
-            console.log("block hash is ", block.hash)
             self.chain.push(block);
             self.height += 1;
-            resolve(block)
+            // Validate chain everytime a new block is added, only accept valid blocks
+            self.validateChain()
+                .then(errorList => {
+                    if (errorList.length > 0) {
+                        self.chain.pop();
+                        reject(errorList);
+                    } else {
+                        resolve(block);
+                    }
+                })
             }
         );
     }
